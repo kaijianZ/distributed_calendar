@@ -6,10 +6,12 @@ class Meeting(object):
         self.end = end
         self.participants = participants
 
-    def participating(self, user):
+    def include(self, user):
         return user in self.participants
 
     def conflict(self, other_meeting):
         pass
 
+
 class Log(object):
+    pass

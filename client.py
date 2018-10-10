@@ -21,6 +21,11 @@ async def hello():
 
 
 if __name__ == "__main__":
+    calender = []
+    matrix_clock = []
+    counter = 0
+    logs = []
+
     loop = asyncio.get_event_loop()
     print("Starting UDP server")
     # One protocol instance will be created to serve all client requests
