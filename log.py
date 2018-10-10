@@ -12,6 +12,15 @@ class Meeting(object):
     def conflict(self, other_meeting):
         pass
 
+    def __str__(self):
+        str_participants = self.participants[0]
+        for user in self.participants[1:]:
+            str_participants += ',' + user
+        return self.name + ' ' + self.day.strftime(
+            "%m/%d/%Y") + ' ' + self.start.isoformat(
+            timespec='minutes') + ' ' + self.end.isoformat(
+            timespec='minutes') + ' ' + str_participants
+
 
 class Log(object):
     pass
