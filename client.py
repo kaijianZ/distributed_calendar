@@ -49,9 +49,24 @@ async def hello():
                         print('Meeting', name, 'scheduled.')
                     else:
                         print('Unable to schedule meeting', name + '.')
+                elif line[0] == 'cancel':
+                    name  = line[1]
+                    # when the user is the only one in the event
+                    if name not in calender:
+                        print("nah")
+                    else:
+                        # deletes the event in the schedule
+                        del calender[name]
+                        counter += 1
+                        # add the deletion to log
+                        # log +=
+                        # output
+                        print(f'Meeting {name} cancelled.')
 
 
-if __name__ == "__main__":
+
+
+if __name__ == "__main__": 
     calender = {}
     matrix_clock = []
     counter = 0
