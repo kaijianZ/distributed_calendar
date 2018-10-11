@@ -11,10 +11,10 @@ class Meeting(object):
 
     def conflict(self, other_meeting):
         return other_meeting.date == self.date and \
-               (self.start < other_meeting.end < self.end or
-                self.start < other_meeting.start < self.end or
-                other_meeting.start < self.end < other_meeting.end or
-                other_meeting.start < self.start < other_meeting.end)
+               (self.start < other_meeting.end <= self.end or
+                self.start <= other_meeting.start < self.end or
+                other_meeting.start < self.end <= other_meeting.end or
+                other_meeting.start <= self.start < other_meeting.end)
 
     def __str__(self):
         str_participants = self.participants[0]

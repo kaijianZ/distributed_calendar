@@ -3,7 +3,7 @@ import asyncio
 from aioconsole import ainput
 from helper import *
 from log import *
-from datetime import date, time
+from datetime import date, time, datetime
 
 
 class CalenderServerProtocol:
@@ -27,27 +27,39 @@ async def hello():
             global matrix_clock
             global log
             if line == 'view':
-                for meeting in sorted_view(calender):
+                for meeting in sorted_view(calender.values()):
                     print(meeting)
-            if line == 'myview':
-                for meeting in sorted_view(filter_by_participants(calender,
-                                                                  node)):
+            elif line == 'myview':
+                for meeting in sorted_view(filter_by_participants(
+                        calender.values(), node)):
                     print(meeting)
+            else:
+                line = line.split(' ')
+                if line[0] == 'schedule':
+                    line = line[1:]
+                    name = line[0]
+                    day = datetime.strptime(line[1], "%m/%d/%Y").date()
+                    start = datetime.strptime(line[2], "%I:%M").time()
+                    end = datetime.strptime(line[3], "%I:%M").time()
+                    participants = line[4].split(',')
+                    new_meeting = Meeting(name, day, start, end, participants)
+                    if ok_to_schedule(calender.values(), new_meeting):
+                        calender[name] = new_meeting
+                        counter += 1
+                        print('Meeting', name, 'scheduled.')
+                    else:
+                        print('Unable to schedule meeting', name + '.')
 
 
 if __name__ == "__main__":
-    calender = set()
+    calender = {}
     matrix_clock = []
     counter = 0
     logs = []
-    node = '1'
+    node = 'user1'
 
-    '''m1 = Meeting('lunch', date(2018, 8, 4), time(1, 52), time(10, 54),
-                 ['1', '2', '3'])
-    m2 = Meeting('dinner', date(2018, 8, 4), time(20, 53), time(21, 55),
-                 ['2', '3'])
-    m3 = Meeting('gaming', date(2018, 8, 4), time(22, 52), time(23, 23), ['1'])
-    calender = set([m1, m2, m3])'''
+    # schedule Breakfast 10/14/2018 08:00 09:00 user1,user2
+    # schedule Conference 10/16/2018 12:00 1:30 user1
 
     lock = asyncio.Lock()
     loop = asyncio.get_event_loop()

@@ -4,9 +4,9 @@ def filter_by_participants(calender, user):
 
 def sorted_view(calender):
     return sorted(list(calender), key=lambda x: (x.date.strftime("%m/%d/%Y"),
-                                           x.start.isoformat(
-                                               timespec='minutes'),
-                                           x.name))
+                                                 x.start.isoformat(
+                                                     timespec='minutes'),
+                                                 x.name))
 
 
 def ok_to_schedule(calender, meeting):
@@ -17,4 +17,3 @@ def ok_to_schedule(calender, meeting):
             if meeting.conflict(s):
                 return False
     return True
-
