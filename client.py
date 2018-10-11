@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 import asyncio
 from aioconsole import ainput
+from helper import *
+from log import *
+from datetime import date, time
 
 
 class CalenderServerProtocol:
@@ -16,16 +19,37 @@ class CalenderServerProtocol:
 
 async def hello():
     while True:
-        line = await ainput('>>> ')
-        print(line)
+        line = await ainput()
+        async with lock:
+            global calender
+            global node
+            global counter
+            global matrix_clock
+            global log
+            if line == 'view':
+                for meeting in sorted_view(calender):
+                    print(meeting)
+            if line == 'myview':
+                for meeting in sorted_view(filter_by_participants(calender,
+                                                                  node)):
+                    print(meeting)
 
 
 if __name__ == "__main__":
-    calender = []
+    calender = set()
     matrix_clock = []
     counter = 0
     logs = []
+    node = '1'
 
+    '''m1 = Meeting('lunch', date(2018, 8, 4), time(1, 52), time(10, 54),
+                 ['1', '2', '3'])
+    m2 = Meeting('dinner', date(2018, 8, 4), time(20, 53), time(21, 55),
+                 ['2', '3'])
+    m3 = Meeting('gaming', date(2018, 8, 4), time(22, 52), time(23, 23), ['1'])
+    calender = set([m1, m2, m3])'''
+
+    lock = asyncio.Lock()
     loop = asyncio.get_event_loop()
     print("Starting UDP server")
     # One protocol instance will be created to serve all client requests
