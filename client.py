@@ -20,21 +20,26 @@ class CalenderServerProtocol:
 async def hello():
     while True:
         line = await ainput()
+
         async with lock:
             global calender
             global node
             global counter
             global matrix_clock
             global log
+
             if line == 'view':
                 for meeting in sorted_view(calender.values()):
                     print(meeting)
+
             elif line == 'myview':
                 for meeting in sorted_view(filter_by_participants(
                         calender.values(), node)):
                     print(meeting)
+
             else:
                 line = line.split(' ')
+
                 if line[0] == 'schedule':
                     line = line[1:]
                     name = line[0]
@@ -49,8 +54,9 @@ async def hello():
                         print('Meeting', name, 'scheduled.')
                     else:
                         print('Unable to schedule meeting', name + '.')
+
                 elif line[0] == 'cancel':
-                    name  = line[1]
+                    name = line[1]
                     # when the user is the only one in the event
                     if name not in calender:
                         print("nah")
@@ -64,9 +70,7 @@ async def hello():
                         print(f'Meeting {name} cancelled.')
 
 
-
-
-if __name__ == "__main__": 
+if __name__ == "__main__":
     calender = {}
     matrix_clock = []
     counter = 0
