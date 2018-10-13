@@ -27,8 +27,9 @@ async def hello():
             global node
             global counter
             global matrix_clock
-            global log
-
+            global logs
+            global hosts
+            global host_num
             if line == 'view':
                 for meeting in sorted_view(calender.values()):
                     print(meeting)
@@ -37,6 +38,10 @@ async def hello():
                 for meeting in sorted_view(filter_by_participants(
                         calender.values(), node)):
                     print(meeting)
+
+            elif line == 'log':
+                for l in logs:
+                    print(l)
 
             else:
                 line = line.split(' ')
@@ -48,11 +53,17 @@ async def hello():
                     start = datetime.strptime(line[2], "%I:%M").time()
                     end = datetime.strptime(line[3], "%I:%M").time()
                     participants = line[4].split(',')
+
                     new_meeting = Meeting(name, day, start, end, participants)
+
                     if ok_to_schedule(calender.values(), new_meeting):
                         calender[name] = new_meeting
                         counter += 1
+                        matrix_clock[host_num[node]][host_num[node]] = counter
+                        new_log = Log('create', counter, node, new_meeting)
+                        logs.append(new_log)
                         print('Meeting', name, 'scheduled.')
+
                     else:
                         print('Unable to schedule meeting', name + '.')
 
@@ -61,12 +72,15 @@ async def hello():
                     # when the user is the only one in the event
                     if name not in calender:
                         print("nah")
+
                     else:
                         # deletes the event in the schedule
                         del calender[name]
                         counter += 1
+                        matrix_clock[host_num[node]][host_num[node]] = counter
+                        new_log = Log('delete', counter, node, name)
+                        logs.append(new_log)
                         # add the deletion to log
-                        # log +=
                         # output
                         print(f'Meeting {name} cancelled.')
 
@@ -90,6 +104,9 @@ if __name__ == "__main__":
                 hosts[line[0]] = int(line[1])
 
     port = hosts[node]
+    host_num = host_to_num(list(hosts.keys()))
+
+    matrix_clock = [[0 for _ in range(len(hosts))] for _ in range(len(hosts))]
 
     lock = asyncio.Lock()
     loop = asyncio.get_event_loop()

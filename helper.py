@@ -19,9 +19,9 @@ def ok_to_schedule(calender, meeting):
     return True
 
 
-def host_by_num(host_list):
-    host_by_num = {}
+def host_to_num(host_list):
+    host_to_num = {}
     host_list.sort()
-    for ind in range(len(host_list)):
-        host_by_num[ind] = [host_list[ind]]
-    return host_by_num
+    for i, ele in enumerate(host_list):
+        host_to_num[ele] = i
+    return host_to_num
