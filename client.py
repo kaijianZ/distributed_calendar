@@ -4,6 +4,7 @@ from aioconsole import ainput
 from helper import *
 from log import *
 from datetime import date, time, datetime
+import sys
 
 
 class CalenderServerProtocol:
@@ -75,16 +76,26 @@ if __name__ == "__main__":
     matrix_clock = []
     counter = 0
     logs = []
-    node = 'user1'
+    node = sys.argv[1]
+    hosts = {}
 
     # schedule Breakfast 10/14/2018 08:00 09:00 user1,user2
     # schedule Conference 10/16/2018 12:00 1:30 user1
+
+    with open('knownhosts_udp.txt', 'r') as f:
+        for line in f.readlines():
+            if len(line) != 0:
+                line = line.strip('\n')
+                line = line.split(' ')
+                hosts[line[0]] = int(line[1])
+
+    port = hosts[node]
 
     lock = asyncio.Lock()
     loop = asyncio.get_event_loop()
     print("Starting UDP server")
     # One protocol instance will be created to serve all client requests
     listen = loop.create_datagram_endpoint(
-        CalenderServerProtocol, local_addr=('127.0.0.1', 9999))
+        CalenderServerProtocol, local_addr=(node, port))
     tasks = [hello(), listen]
     loop.run_until_complete(asyncio.wait(tasks))
