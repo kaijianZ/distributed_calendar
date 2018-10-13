@@ -17,3 +17,11 @@ def ok_to_schedule(calender, meeting):
             if meeting.conflict(s):
                 return False
     return True
+
+
+def host_by_num(host_list):
+    host_by_num = {}
+    host_list.sort()
+    for ind in range(len(host_list)):
+        host_by_num[ind] = [host_list[ind]]
+    return host_by_num
