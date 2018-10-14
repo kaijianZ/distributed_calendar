@@ -152,15 +152,12 @@ async def console_input():
 
 
 if __name__ == "__main__":
-    calender = {}
-    t_i = []
-    counter = 0
-    logs = []
-    this_node = sys.argv[1]
-    hosts = {}
 
     # schedule Breakfast 10/14/2018 08:00 09:00 192.168.0.7,192.168.0.21
     # schedule Conference 10/16/2018 12:00 13:30 192.168.0.7
+
+    this_node = sys.argv[1]
+    hosts = {}
 
     with open('knownhosts_udp.txt', 'r') as f:
         for line in f.readlines():
@@ -168,11 +165,14 @@ if __name__ == "__main__":
                 line = line.strip('\n')
                 line = line.split(' ')
                 hosts[line[0]] = int(line[1])
-
     port = hosts[this_node]
     host_num_dict = host_to_num(list(hosts.keys()))
 
+    # variables that can be persisted
     t_i = [[0 for _ in range(len(hosts))] for _ in range(len(hosts))]
+    calender = {}
+    counter = 0
+    logs = []
 
     loop = asyncio.get_event_loop()
     print("Starting UDP server")
