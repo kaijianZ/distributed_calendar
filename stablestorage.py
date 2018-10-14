@@ -5,7 +5,7 @@ from log import *
 
 STABLE_STORAGE = 'logs.pkl'
 
-def load_log(all_logs):
+def load_obj(all_logs):
 	if os.path.isfile(STABLE_STORAGE) is True:
 		with open(STABLE_STORAGE, 'rb') as input:
 			all_logs = pickle.load(input)
@@ -15,7 +15,7 @@ def load_log(all_logs):
 		return False
   
 
-def dump_log(all_logs):
+def dump_obj(all_logs):
 	with open(STABLE_STORAGE, 'wb') as output:
 		pickle.dump(all_logs, output, pickle.HIGHEST_PROTOCOL)
 	
@@ -31,7 +31,7 @@ def print_logs(all_logs):
 if __name__ == "__main__":
 	""" restore log """
 	all_logs = []
-	load_log(all_logs)
+	load_obj(all_logs)
 
 	""" receive log """
 	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -45,7 +45,7 @@ if __name__ == "__main__":
 	print(all_logs)
 
 	""" update log """
-	dump_log(all_logs)
+	dump_obj(all_logs)
 
 	for i in range(4): 
 		print('.')

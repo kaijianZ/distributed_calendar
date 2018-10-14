@@ -88,6 +88,10 @@ class CalenderServerProtocol:
         for name in waiting_delete:
             delete(name)
 
+        # dump variables to stable storage
+        obj_list = [t_i, calender, counter, logs]
+        dump_stable(obj_list)
+    
 
 async def console_input():
     while True:
@@ -151,6 +155,10 @@ async def console_input():
                     # deletes the event in the schedule
                     delete(name)
 
+        # dump variables to stable storage
+        obj_list = [t_i, calender, counter, logs]
+        dump_stable(obj_list)
+
 
 if __name__ == "__main__":
 
@@ -169,11 +177,18 @@ if __name__ == "__main__":
     port = hosts[this_node]
     host_num_dict = host_to_num(list(hosts.keys()))
 
-    # variables that can be persisted
-    t_i = [[0 for _ in range(len(hosts))] for _ in range(len(hosts))]
-    calender = {}
-    counter = 0
-    logs = []
+    obj_list = []
+    # try to load from stable storage
+    if load_stable(obj_list) == True:
+        t_i = obj_list[0]
+        calender = obj_list[1]
+        counter = obj_list[2]
+        logs = obj_list[3]
+    else:
+        t_i = [[0 for _ in range(len(hosts))] for _ in range(len(hosts))]
+        calender = {}
+        counter = 0
+        logs = []
 
     loop = asyncio.get_event_loop()
     print("Starting UDP server")

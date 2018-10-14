@@ -1,5 +1,8 @@
 import pickle
 import socket
+import os.path
+
+STABLE_STORAGE = 'stable.pkl'
 
 
 def filter_by_participants(calender, user):
@@ -49,3 +52,17 @@ def notify(participants, this_node, t_i, logs, hosts, host_num_dict):
     for host in participants:
         if host != this_node:
             send_log(t_i, logs, host, hosts[host], host_num_dict)
+
+
+def load_stable(obj_list):
+    if os.path.isfile(STABLE_STORAGE) is True:
+        with open(STABLE_STORAGE, 'rb') as input:
+            obj_list = pickle.load(input)
+        return True
+    else:
+        return False
+  
+
+def dump_stable(obj_list):
+    with open(STABLE_STORAGE, 'wb') as output:
+        pickle.dump(obj_list, output, pickle.HIGHEST_PROTOCOL)
