@@ -62,6 +62,7 @@ class CalenderServerProtocol:
                     continue
 
         for name in waiting_delete:
+            participants = calender[name].participants
             del calender[name]
             counter += 1
             matrix_clock[host_num[node]][host_num[node]] = counter
@@ -138,6 +139,7 @@ async def hello():
 
                     else:
                         # deletes the event in the schedule
+                        participants = calender[name].participants
                         del calender[name]
                         counter += 1
                         matrix_clock[host_num[node]][host_num[node]] = counter
