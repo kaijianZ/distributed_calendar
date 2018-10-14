@@ -1,6 +1,5 @@
 import pickle
 import socket
-from log import *
 
 
 def filter_by_participants(calender, user):
@@ -44,3 +43,9 @@ def send_log(matrix_clock, logs, host, port, host_num_dict):
 
 def has_rec(t, log, host_num):
     return t[host_num][log.node] >= log.time
+
+
+def notify(participants, this_node, t_i, logs, hosts, host_num_dict):
+    for host in participants:
+        if host != this_node:
+            send_log(t_i, logs, host, hosts[host], host_num_dict)

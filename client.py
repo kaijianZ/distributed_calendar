@@ -22,10 +22,7 @@ def delete(name):
     t_i[host_num_dict[this_node]][host_num_dict[this_node]] = counter
     new_log = Log('delete', counter, host_num_dict[this_node], name)
     logs.append(new_log)
-    for host in participants:
-        if host != this_node:
-            send_log(t_i, logs, host, hosts[host],
-                     host_num_dict)
+    notify(participants, this_node, t_i, logs, hosts, host_num_dict)
     print(f'Meeting {name} cancelled.')
 
 
@@ -53,7 +50,9 @@ class CalenderServerProtocol:
                 delete_set.add(l.value)
             else:
                 insert_set.add(l.value)
+
         waiting_delete = set()
+
         for insert_meeting in insert_set:
             if insert_meeting.name not in delete_set:
                 for meeting in sorted_view(filter_by_participants(
@@ -66,14 +65,18 @@ class CalenderServerProtocol:
                             not in delete_set:
                         waiting_delete.add(meeting.name)
                 calender[insert_meeting.name] = insert_meeting
+
         for delete_meeting in delete_set:
             if delete_meeting in calender:
                 del calender[delete_meeting]
+
         for r in range(len(hosts)):
             t_i[i][r] = max(t_i[i][r], t_k[k][r])
+
         for r in range(len(hosts)):
             for s in range(len(hosts)):
                 t_i[r][s] = max(t_i[r][s], t_k[r][s])
+
         for l in NE:
             if l not in logs:
                 for s in range(len(hosts)):
@@ -132,10 +135,8 @@ async def console_input():
                                   new_meeting)
                     logs.append(new_log)
                     print('Meeting', name, 'scheduled.')
-                    for host in participants:
-                        if host != this_node:
-                            send_log(t_i, logs, host, hosts[host],
-                                     host_num_dict)
+                    notify(participants, this_node, t_i, logs, hosts,
+                           host_num_dict)
 
                 else:
                     print('Unable to schedule meeting', name + '.')
