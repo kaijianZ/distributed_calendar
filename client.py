@@ -109,8 +109,8 @@ async def hello():
                     line = line[1:]
                     name = line[0]
                     day = datetime.strptime(line[1], "%m/%d/%Y").date()
-                    start = datetime.strptime(line[2], "%I:%M").time()
-                    end = datetime.strptime(line[3], "%I:%M").time()
+                    start = datetime.strptime(line[2], "%H:%M").time()
+                    end = datetime.strptime(line[3], "%H:%M").time()
                     participants = line[4].split(',')
 
                     new_meeting = Meeting(name, day, start, end, participants)
@@ -161,7 +161,7 @@ if __name__ == "__main__":
     hosts = {}
 
     # schedule Breakfast 10/14/2018 08:00 09:00 192.168.0.7,192.168.0.21
-    # schedule Conference 10/16/2018 12:00 1:30 192.168.0.7
+    # schedule Conference 10/16/2018 12:00 13:30 192.168.0.7
 
     with open('knownhosts_udp.txt', 'r') as f:
         for line in f.readlines():
