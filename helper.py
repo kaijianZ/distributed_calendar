@@ -56,8 +56,8 @@ def notify(participants, this_node, t_i, logs, hosts, host_num_dict):
 
 def load_stable(host_len):
     if os.path.isfile(STABLE_STORAGE) is True:
-        with open(STABLE_STORAGE, 'rb') as input:
-            obj_list = pickle.load(input)
+        with open(STABLE_STORAGE, 'rb') as fin:
+            obj_list = pickle.load(fin)
         return obj_list
     else:
         t_i = [[0 for _ in range(host_len)] for _ in range(host_len)]
@@ -70,5 +70,5 @@ def load_stable(host_len):
   
 
 def dump_stable(obj_list):
-    with open(STABLE_STORAGE, 'wb') as output:
-        pickle.dump(obj_list, output, pickle.HIGHEST_PROTOCOL)
+    with open(STABLE_STORAGE, 'wb') as fout:
+        pickle.dump(obj_list, fout, pickle.HIGHEST_PROTOCOL)
