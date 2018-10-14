@@ -13,4 +13,3 @@ for i in data[1]:
 	print(i.node)
 	print(i.value)
 s.close()
-
