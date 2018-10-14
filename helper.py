@@ -58,9 +58,15 @@ def load_stable(obj_list):
     if os.path.isfile(STABLE_STORAGE) is True:
         with open(STABLE_STORAGE, 'rb') as input:
             obj_list = pickle.load(input)
-        return True
+        return obj_list
     else:
-        return False
+        t_i = [[0 for _ in range(len(hosts))] for _ in range(len(hosts))]
+        calender = {}
+        counter = 0
+        logs = []
+        obj_list = {'t_i':t_i, 'calender':calender, 
+                    'counter':counter, 'logs':logs}
+        return obj_list
   
 
 def dump_stable(obj_list):
