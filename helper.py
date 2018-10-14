@@ -25,3 +25,13 @@ def host_to_num(host_list):
     for i, ele in enumerate(host_list):
         host_to_num[ele] = i
     return host_to_num
+
+def send(pl, listHasNoRec):
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    for index in enumerate(hasNoRec):
+        siteaddr = listHasNoRec[index][0]
+        siteport = listHasNoRec[index][1]
+        s.sendto(pl, (siteaddr, siteport))
+    s.close()
+
+def hasRec(pl)
