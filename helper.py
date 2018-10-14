@@ -1,5 +1,6 @@
 import pickle
 import socket
+from log import *
 
 
 def filter_by_participants(calender, user):
@@ -43,3 +44,24 @@ def send_log(matrix_clock, logs, host, port, host_num_dict):
 
 def has_rec(t, log, host_num):
     return t[host_num][log.node] >= log.time
+
+
+def delete(name):
+    global calender
+    global this_node
+    global counter
+    global t_i
+    global logs
+    global hosts
+    global host_num_dict
+    participants = calender[name].participants
+    del calender[name]
+    counter += 1
+    t_i[host_num_dict[this_node]][host_num_dict[this_node]] = counter
+    new_log = Log('delete', counter, host_num_dict[this_node], name)
+    logs.append(new_log)
+    for host in participants:
+        if host != this_node:
+            send_log(t_i, logs, host, hosts[host],
+                     host_num_dict)
+    print(f'Meeting {name} cancelled.')

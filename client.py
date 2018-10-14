@@ -14,16 +14,16 @@ class CalenderServerProtocol:
 
     def datagram_received(self, data, addr):
         global calender
-        global node
+        global this_node
         global counter
-        global matrix_clock
+        global t_i
         global logs
         global hosts
-        global host_num
-        k = host_num[addr[0]]
-        i = host_num[node]
+        global host_num_dict
+        k = host_num_dict[addr[0]]
+        i = host_num_dict[this_node]
         t_k, NP = pickle.loads(data)
-        NE = list(filter(lambda rec: not has_rec(matrix_clock, rec,
+        NE = list(filter(lambda rec: not has_rec(t_i, rec,
                                                  i), NP))
         insert_set = set()
         delete_set = set()
@@ -36,7 +36,7 @@ class CalenderServerProtocol:
         for insert_meeting in insert_set:
             if insert_meeting.name not in delete_set:
                 for meeting in sorted_view(filter_by_participants(
-                        calender.values(), node)):
+                        calender.values(), this_node)):
                     if insert_meeting.conflict(meeting) and \
                             insert_meeting.name > meeting.name:
                         waiting_delete.add(insert_meeting.name)
@@ -49,30 +49,20 @@ class CalenderServerProtocol:
             if delete_meeting in calender:
                 del calender[delete_meeting]
         for r in range(len(hosts)):
-            matrix_clock[i][r] = max(matrix_clock[i][r], t_k[k][r])
+            t_i[i][r] = max(t_i[i][r], t_k[k][r])
         for r in range(len(hosts)):
             for s in range(len(hosts)):
-                matrix_clock[r][s] = max(matrix_clock[r][s], t_k[r][s])
+                t_i[r][s] = max(t_i[r][s], t_k[r][s])
         for l in NE:
             if l not in logs:
                 for s in range(len(hosts)):
-                    if not has_rec(matrix_clock, l, s):
+                    if not has_rec(t_i, l, s):
                         logs.append(l)
                 else:
                     continue
 
         for name in waiting_delete:
-            participants = calender[name].participants
-            del calender[name]
-            counter += 1
-            matrix_clock[host_num[node]][host_num[node]] = counter
-            new_log = Log('delete', counter, host_num[node], name)
-            logs.append(new_log)
-            for host in participants:
-                if host != node:
-                    send_log(matrix_clock, logs, host, hosts[host],
-                             host_num)
-            print(f'Meeting {name} cancelled.')
+            delete(name)
 
 
 async def hello():
@@ -80,19 +70,19 @@ async def hello():
         line = await ainput()
 
         global calender
-        global node
+        global this_node
         global counter
-        global matrix_clock
+        global t_i
         global logs
         global hosts
-        global host_num
+        global host_num_dict
         if line == 'view':
             for meeting in sorted_view(calender.values()):
                 print(meeting)
 
         elif line == 'myview':
             for meeting in sorted_view(filter_by_participants(
-                    calender.values(), node)):
+                    calender.values(), this_node)):
                 print(meeting)
 
         elif line == 'log':
@@ -115,15 +105,15 @@ async def hello():
                 if ok_to_schedule(calender.values(), new_meeting):
                     calender[name] = new_meeting
                     counter += 1
-                    matrix_clock[host_num[node]][host_num[node]] = counter
-                    new_log = Log('create', counter, host_num[node],
+                    t_i[host_num_dict[this_node]][host_num_dict[this_node]] = counter
+                    new_log = Log('create', counter, host_num_dict[this_node],
                                   new_meeting)
                     logs.append(new_log)
                     print('Meeting', name, 'scheduled.')
                     for host in participants:
-                        if host != node:
-                            send_log(matrix_clock, logs, host, hosts[host],
-                                     host_num)
+                        if host != this_node:
+                            send_log(t_i, logs, host, hosts[host],
+                                     host_num_dict)
 
                 else:
                     print('Unable to schedule meeting', name + '.')
@@ -136,25 +126,15 @@ async def hello():
 
                 else:
                     # deletes the event in the schedule
-                    participants = calender[name].participants
-                    del calender[name]
-                    counter += 1
-                    matrix_clock[host_num[node]][host_num[node]] = counter
-                    new_log = Log('delete', counter, host_num[node], name)
-                    logs.append(new_log)
-                    for host in participants:
-                        if host != node:
-                            send_log(matrix_clock, logs, host, hosts[host],
-                                     host_num)
-                    print(f'Meeting {name} cancelled.')
+                    delete(name)
 
 
 if __name__ == "__main__":
     calender = {}
-    matrix_clock = []
+    t_i = []
     counter = 0
     logs = []
-    node = sys.argv[1]
+    this_node = sys.argv[1]
     hosts = {}
 
     # schedule Breakfast 10/14/2018 08:00 09:00 192.168.0.7,192.168.0.21
@@ -167,15 +147,15 @@ if __name__ == "__main__":
                 line = line.split(' ')
                 hosts[line[0]] = int(line[1])
 
-    port = hosts[node]
-    host_num = host_to_num(list(hosts.keys()))
+    port = hosts[this_node]
+    host_num_dict = host_to_num(list(hosts.keys()))
 
-    matrix_clock = [[0 for _ in range(len(hosts))] for _ in range(len(hosts))]
+    t_i = [[0 for _ in range(len(hosts))] for _ in range(len(hosts))]
 
     loop = asyncio.get_event_loop()
     print("Starting UDP server")
     # One protocol instance will be created to serve all client requests
     listen = loop.create_datagram_endpoint(
-        CalenderServerProtocol, local_addr=(node, port))
+        CalenderServerProtocol, local_addr=(this_node, port))
     tasks = [hello(), listen]
     loop.run_until_complete(asyncio.wait(tasks))
