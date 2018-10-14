@@ -89,7 +89,8 @@ class CalenderServerProtocol:
             delete(name)
 
         # dump variables to stable storage
-        obj_list = [t_i, calender, counter, logs]
+        obj_list = {'t_i':t_i, 'calender':calender, 
+                    'counter':counter, 'logs':logs}
         dump_stable(obj_list)
     
 
@@ -156,7 +157,8 @@ async def console_input():
                     delete(name)
 
         # dump variables to stable storage
-        obj_list = [t_i, calender, counter, logs]
+        obj_list = {'t_i':t_i, 'calender':calender, 
+                    'counter':counter, 'logs':logs}
         dump_stable(obj_list)
 
 
@@ -177,13 +179,13 @@ if __name__ == "__main__":
     port = hosts[this_node]
     host_num_dict = host_to_num(list(hosts.keys()))
 
-    obj_list = []
+    obj_list = {}
     # try to load from stable storage
     if load_stable(obj_list) == True:
-        t_i = obj_list[0]
-        calender = obj_list[1]
-        counter = obj_list[2]
-        logs = obj_list[3]
+        t_i = obj_list['t_i']
+        calender = obj_list['calender']
+        counter = obj_list['counter']
+        logs = obj_list['logs']
     else:
         t_i = [[0 for _ in range(len(hosts))] for _ in range(len(hosts))]
         calender = {}
