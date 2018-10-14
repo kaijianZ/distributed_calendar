@@ -180,7 +180,7 @@ if __name__ == "__main__":
     host_num_dict = host_to_num(list(hosts.keys()))
 
     # try to load from stable storage
-    obj_list = load_stable(obj_list)
+    obj_list = load_stable(len(hosts))
     t_i = obj_list['t_i']
     calender = obj_list['calender']
     counter = obj_list['counter']

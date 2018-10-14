@@ -54,13 +54,13 @@ def notify(participants, this_node, t_i, logs, hosts, host_num_dict):
             send_log(t_i, logs, host, hosts[host], host_num_dict)
 
 
-def load_stable(obj_list):
+def load_stable(host_len):
     if os.path.isfile(STABLE_STORAGE) is True:
         with open(STABLE_STORAGE, 'rb') as input:
             obj_list = pickle.load(input)
         return obj_list
     else:
-        t_i = [[0 for _ in range(len(hosts))] for _ in range(len(hosts))]
+        t_i = [[0 for _ in range(host_len)] for _ in range(host_len)]
         calender = {}
         counter = 0
         logs = []
