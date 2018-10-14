@@ -8,6 +8,27 @@ import sys
 import pickle
 
 
+def delete(name):
+    global calender
+    global this_node
+    global counter
+    global t_i
+    global logs
+    global hosts
+    global host_num_dict
+    participants = calender[name].participants
+    del calender[name]
+    counter += 1
+    t_i[host_num_dict[this_node]][host_num_dict[this_node]] = counter
+    new_log = Log('delete', counter, host_num_dict[this_node], name)
+    logs.append(new_log)
+    for host in participants:
+        if host != this_node:
+            send_log(t_i, logs, host, hosts[host],
+                     host_num_dict)
+    print(f'Meeting {name} cancelled.')
+
+
 class CalenderServerProtocol:
     def connection_made(self, transport):
         self.transport = transport
@@ -65,7 +86,7 @@ class CalenderServerProtocol:
             delete(name)
 
 
-async def hello():
+async def console_input():
     while True:
         line = await ainput()
 
@@ -105,7 +126,8 @@ async def hello():
                 if ok_to_schedule(calender.values(), new_meeting):
                     calender[name] = new_meeting
                     counter += 1
-                    t_i[host_num_dict[this_node]][host_num_dict[this_node]] = counter
+                    t_i[host_num_dict[this_node]][
+                        host_num_dict[this_node]] = counter
                     new_log = Log('create', counter, host_num_dict[this_node],
                                   new_meeting)
                     logs.append(new_log)
@@ -157,5 +179,5 @@ if __name__ == "__main__":
     # One protocol instance will be created to serve all client requests
     listen = loop.create_datagram_endpoint(
         CalenderServerProtocol, local_addr=(this_node, port))
-    tasks = [hello(), listen]
+    tasks = [console_input(), listen]
     loop.run_until_complete(asyncio.wait(tasks))
