@@ -64,6 +64,10 @@ async def hello():
                                       new_meeting)
                         logs.append(new_log)
                         print('Meeting', name, 'scheduled.')
+                        for host in participants:
+                            if host != node:
+                                send_log(matrix_clock, logs, host, hosts[host],
+                                         host_num)
 
                     else:
                         print('Unable to schedule meeting', name + '.')
@@ -81,8 +85,10 @@ async def hello():
                         matrix_clock[host_num[node]][host_num[node]] = counter
                         new_log = Log('delete', counter, host_num[node], name)
                         logs.append(new_log)
-                        # add the deletion to log
-                        # output
+                        for host in participants:
+                            if host != node:
+                                send_log(matrix_clock, logs, host, hosts[host],
+                                         host_num)
                         print(f'Meeting {name} cancelled.')
 
 
@@ -94,8 +100,8 @@ if __name__ == "__main__":
     node = sys.argv[1]
     hosts = {}
 
-    # schedule Breakfast 10/14/2018 08:00 09:00 user1,user2
-    # schedule Conference 10/16/2018 12:00 1:30 user1
+    # schedule Breakfast 10/14/2018 08:00 09:00 192.168.0.7,192.168.0.21
+    # schedule Conference 10/16/2018 12:00 1:30 192.168.0.7
 
     with open('knownhosts_udp.txt', 'r') as f:
         for line in f.readlines():
