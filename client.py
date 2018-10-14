@@ -5,6 +5,7 @@ from helper import *
 from log import *
 from datetime import date, time, datetime
 import sys
+import pickle
 
 
 class CalenderServerProtocol:
@@ -12,10 +13,68 @@ class CalenderServerProtocol:
         self.transport = transport
 
     def datagram_received(self, data, addr):
-        message = data.decode()
-        print('Received %r from %s' % (message, addr))
-        print('Send %r to %s' % (message, addr))
-        self.transport.sendto(data, addr)
+        async with lock:
+            global calender
+            global node
+            global counter
+            global matrix_clock
+            global logs
+            global hosts
+            global host_num
+            k = host_num[addr[0]]
+            i = host_num[node]
+            t_k, NP = pickle.loads(data)
+            NE = list(filter(lambda rec: not has_rec(matrix_clock, rec,
+                                                        i), NP))
+            insert_set = set()
+            delete_set = set()
+            for l in NE:
+                if l.op == 'delete':
+                    delete_set.add(l.value)
+                else:
+                    insert_set.add(l.value)
+            waiting_delete = set()
+            for insert_meeting in insert_set:
+                if insert_meeting.name not in delete_set:
+                    for meeting in sorted_view(filter_by_participants(
+                            calender.values(), node)):
+                        if insert_meeting.conflict(meeting) and \
+                                insert_meeting.name > meeting.name:
+                            waiting_delete.add(insert_meeting.name)
+                            continue
+                        elif insert_meeting.conflict(meeting) and meeting.name\
+                                not in delete_set:
+                            waiting_delete.add(meeting.name)
+                    calender[insert_meeting.name] = insert_meeting
+            for delete_meeting in delete_set:
+                if delete_meeting in calender:
+                    del calender[delete_meeting]
+            for r in range(len(hosts)):
+                matrix_clock[i][r] = max(matrix_clock[i][r], t_k[k][r])
+            for r in range(len(hosts)):
+                for s in range(len(hosts)):
+                    matrix_clock[r][s] = max(matrix_clock[r][s], t_k[r][s])
+            for l in NE:
+                if l not in logs:
+                    for s in range(len(hosts)):
+                        if not has_rec(matrix_clock, l, s):
+                            logs.append(l)
+                    else:
+                        continue
+
+            for name in waiting_delete:
+                del calender[name]
+                counter += 1
+                matrix_clock[host_num[node]][host_num[node]] = counter
+                new_log = Log('delete', counter, host_num[node], name)
+                logs.append(new_log)
+                for host in participants:
+                    if host != node:
+                        send_log(matrix_clock, logs, host, hosts[host],
+                                 host_num)
+                print(f'Meeting {name} cancelled.')
+
+
 
 
 async def hello():
