@@ -60,7 +60,8 @@ async def hello():
                         calender[name] = new_meeting
                         counter += 1
                         matrix_clock[host_num[node]][host_num[node]] = counter
-                        new_log = Log('create', counter, node, new_meeting)
+                        new_log = Log('create', counter, host_num[node],
+                                      new_meeting)
                         logs.append(new_log)
                         print('Meeting', name, 'scheduled.')
 
@@ -78,7 +79,7 @@ async def hello():
                         del calender[name]
                         counter += 1
                         matrix_clock[host_num[node]][host_num[node]] = counter
-                        new_log = Log('delete', counter, node, name)
+                        new_log = Log('delete', counter, host_num[node], name)
                         logs.append(new_log)
                         # add the deletion to log
                         # output

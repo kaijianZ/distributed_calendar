@@ -1,3 +1,6 @@
+import pickle
+import socket
+
 def filter_by_participants(calender, user):
     return list(filter(lambda x: x.include(user), list(calender)))
 
@@ -26,12 +29,17 @@ def host_to_num(host_list):
         host_to_num[ele] = i
     return host_to_num
 
-def send(pl, listHasNoRec):
+
+def send_log(matrix_clock, logs, host, port, host_num_dict):
+    host_num = host_num_dict[host]
+    sending_logs = list(filter(lambda rec: not hasRec(matrix_clock, rec,
+                                                      host_num), logs))
+    sending_logs = pickle.dumps((matrix_clock, sending_logs))
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    for index in enumerate(hasNoRec):
-        siteaddr = listHasNoRec[index][0]
-        siteport = listHasNoRec[index][1]
-        s.sendto(pl, (siteaddr, siteport))
+    s.sendto(sending_logs, (host, port))
     s.close()
 
-def hasRec(pl)
+
+
+def hasRec(t, log, k):
+    pass

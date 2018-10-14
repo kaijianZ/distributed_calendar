@@ -30,7 +30,7 @@ class Log(object):
     def __init__(self, op, time, node, value):
         self.op = op
         self.time = time
-        self.node = node
+        self.node = node  # a number representation of node
         self.value = value
 
     def __str__(self):
