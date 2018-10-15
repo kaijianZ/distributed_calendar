@@ -89,10 +89,10 @@ class CalenderServerProtocol:
             delete(name)
 
         # dump variables to stable storage
-        obj_list = {'t_i':t_i, 'calender':calender, 
-                    'counter':counter, 'logs':logs}
+        obj_list = {'t_i': t_i, 'calender': calender,
+                    'counter': counter, 'logs': logs}
         dump_stable(obj_list)
-    
+
 
 async def console_input():
     while True:
@@ -157,8 +157,8 @@ async def console_input():
                     delete(name)
 
         # dump variables to stable storage
-        obj_list = {'t_i':t_i, 'calender':calender, 
-                    'counter':counter, 'logs':logs}
+        obj_list = {'t_i': t_i, 'calender': calender,
+                    'counter': counter, 'logs': logs}
         dump_stable(obj_list)
 
 

@@ -64,10 +64,10 @@ def load_stable(host_len):
         calender = {}
         counter = 0
         logs = []
-        obj_list = {'t_i':t_i, 'calender':calender, 
-                    'counter':counter, 'logs':logs}
+        obj_list = {'t_i': t_i, 'calender': calender,
+                    'counter': counter, 'logs': logs}
         return obj_list
-  
+
 
 def dump_stable(obj_list):
     with open(STABLE_STORAGE, 'wb') as fout:
